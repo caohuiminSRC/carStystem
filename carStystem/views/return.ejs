@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>汽车租赁 —— 归还登记</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <style>
+        body{
+            background: url("img/redlsls.jpg") no-repeat center ;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航条开始 -->
+    <% include ./nav/nav.ejs %>
+    <!-- 导航条结束 -->
+    <div class="container">
+    <div class="row">
+        <div class="col-lg-12 modal-content">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th id="hao">行号</th>
+                                <th>租赁人</th>
+                                <th>租赁名称</th>
+                                <th>租赁时长</th>
+                                <th>每天租金</th>
+                                <th>已付押金</th>
+                                <th>应付金额</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbody"></tbody>
+                        </table>
+                        <div class="col-lg-3 pl0">
+                            <div class="form-group">
+                                <label for="fu">已付押金:<input type="text" class="form-control" name="fu" id="fu" placeholder="">元</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 pl0">
+                            <div class="form-group">
+                                <label for="zujin">应付金额:<input type="text" id="zujin" class="form-control" name="zujin"  placeholder="">元</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 pl0">
+                            <div class="form-group">
+                                <label for="zong">找零金额:<input type="text" class="form-control" name="zong" id="zong" placeholder="">元</label>
+                            </div>
+                        </div>
+                        <button   id="huan" class="btn">确定</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script type="text/javascript" src="/js/jquery-1.12.3.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.js"></script>
+    <script type="text/javascript" src="/js/PageNav.js"></script>
+    <script type="text/javascript">
+    $.post("/lease1",function(data){
+        console.log(data)
+        var paixu =data.results.sort(compare("sid"))
+        $.each(paixu ,function(i, n){
+            $tr = $("<tr></tr>");
+            $("<td><input type='radio' name='xuhao' value='"+n.id+"' data-sid='"+n.sid+"'></td>").appendTo($tr);
+            $("<td></td>").html(n.sid).appendTo($tr);
+            $("<td></td>").html(n.guest).appendTo($tr);
+            $("<td></td>").html(n.carClass).appendTo($tr);
+            $("<td></td>").html(n.day+ " 天").appendTo($tr);
+            $("<td></td>").html(n.rent).appendTo($tr);
+            $("<td></td>").html(n.pay).appendTo($tr);
+            $("<td></td>").html(n.total).appendTo($tr);
+            //上树
+            $tr.appendTo($("#tbody"));
+        })
+        //获取汽车租金
+        $("#tbody tr").click(function () {
+            $("input[name=xuhao]").removeAttr('checked');
+            $(this).children("td").children("input[name=xuhao]").prop('checked','true');
+            var sid=$(this).children("td").children("input[name=xuhao]").attr("data-sid");
+            ids=sid;
+            $.get("/quedinghuan/"+ids,function (data) {
+                $("#zujin").val(data.result.rent*parseInt(data.result.day)).attr("disabled", true);
+                $("#fu").val(data.result.pay).attr("disabled", true);
+                var ling=parseInt($("#fu").val())-parseInt($("#zujin").val())
+                if(ling<0){
+                    $("#zong").val(ling);
+                    alert("不好意思，钱没交够");
+                    return;
+                }
+                $("#zong").val(ling);
+            })
+        })
+    });
+    var compare = function (prop) {
+        return function (obj1, obj2) {
+            var val1 = obj1[prop];
+            var val2 = obj2[prop];
+            if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
+                val1 = Number(val1);
+                val2 = Number(val2);
+            }
+            if (val1 < val2) {
+                return -1;
+            } else if (val1 > val2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    }
+    $("#zujin").on('input',function () {
+        if(parseInt($(this).val())>parseInt($("#price").html())){
+            alert("价格不能随意更改");
+            $(this).val($("#price").html())
+            return;
+        }
+        var zong= parseInt($("#shi2").val())-parseInt($(this).val())//计算价格
+        $("#zong").val(zong);//总价格
+    })
+    $("input[name=shi2]").on('input',function () {
+        var zong= parseInt($("#zujin").val())-parseInt($(this).val())//计算价格
+        $("#zong").val(zong);//总价格
+    })
+    $("#huan").click(function () {
+        if(parseInt($("#fu").val())-parseInt($("#zujin").val())<0){
+            alert("不好意思，钱没交够");
+            return;
+        }
+        var id=$("input[name=xuhao]:checked").val();
+        var sid=$("input[name=xuhao]:checked").attr("data-sid")
+        var tr=$("input[name=xuhao]:checked").parent().parent()
+        ids=sid;
+        $.get("/returnCar?sid="+ids+"&id="+id,function (data) {
+            if(data.result==1){
+                tr.remove();
+                $("input[type=text]").val("")
+                alert("归还成功")
+            }
+        })
+    })
+</script>
+</body>
+</html>

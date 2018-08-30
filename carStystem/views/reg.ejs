@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>汽车租赁 —— 用户注册</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        em.r{
+            display: inline-block;
+            width:20px;
+            height: 20px;
+            background-color: yellowgreen;
+            color:white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+        }
+        em.w{
+            display: inline-block;
+            width:20px;
+            height: 20px;
+            background-color: red;
+            color:white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+        }
+        body{
+            background: url("img/bg.jpg");
+            color: #9d9d9d;
+        }
+        .container{
+            margin: 100px auto;
+            width: 50%;
+        }
+        .container .col-lg-4{
+            width: 100%;
+        }
+        .container h1{
+            margin-bottom: 40px;
+        }
+        .form-group{
+            margin: 25px 0;
+        }
+        #yonghuming,#mima,#querenmima{
+            width: 70%;
+            opacity: 0.3;
+        }
+        .text{
+            margin-left: 20px;
+            color: #9d9d9d;
+        }
+        #zhuce{
+            background: #5e5e5e;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="col-lg-4">
+        <h1>汽车租赁系统 -- 注册</h1>
+        <form>
+            <div class="form-group">
+                <label for="yonghuming">用户名</label>
+                <input type="text" class="form-control" name="yonghuming" id="yonghuming" placeholder="用户名可以是中文">
+                <em class=""></em>
+                <span class="explain"></span>
+            </div>
+            <div class="form-group">
+                <label for="mima">密码</label>
+                <input type="password" class="form-control" name="mima" id="mima" placeholder="密码最少6位">
+                <em class=""></em>
+                <span class="explain"></span>
+            </div>
+            <div class="form-group">
+                <label for="querenmima">确认密码</label>
+                <input type="password" class="form-control" id="querenmima" placeholder="请重复输入">
+                <em class=""></em>
+                <span class="explain"></span>
+            </div>
+            <button type="button" class="btn" id="zhuce">注册</button>
+            <a href="/" class="text">已有账号，请点击此处登录</a>
+        </form>
+    </div>
+</div>
+
+<script src="js/jquery-1.12.3.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    var yonghumingcheck = false;
+    var mimacheck = false;
+    var querencheck = false;
+    //离开用户名
+    $("#yonghuming").blur(function(){
+        var yonghuming = $(this).val();
+        //正则
+        if(/[\!\@\$\<\>\*\^]/.test(yonghuming)){
+            $(this).siblings("em").attr("class","w").html("x");
+            $(this).siblings(".explain").html("用户名中有非法字符");
+            yonghumingcheck = false;
+            return;
+        }
+        //Ajax验证用户名是否被占用
+        var $this = $(this);
+        $.get("/checkuserexist?yonghuming=" + yonghuming , function(data){
+            if(data.result == -1){
+                $this.siblings("em").attr("class","w").html("x");
+                $this.siblings(".explain").html("用户名被占用");
+                yonghumingcheck = false;
+            }else{
+                $this.siblings("em").attr("class","r").html("√");
+                $this.siblings(".explain").html("用户名可以使用");
+                yonghumingcheck = true;
+            }
+        });
+    });
+    $("input[type=text],input[type=password]").focus(function(){
+        $(this).siblings("em").attr("class","").html("");
+        $(this).siblings(".explain").html("");
+    });
+    //密码的验证
+    $("#mima").blur(function(){
+        var mima = $(this).val();
+        //正则
+        if(mima.length < 6){
+            $(this).siblings("em").attr("class","w").html("x");
+            $(this).siblings(".explain").html("密码长度不够！");
+            mimacheck = false;
+            return;
+        }else{
+            $(this).siblings("em").attr("class","r").html("√");
+            $(this).siblings(".explain").html("密码合法！");
+            mimacheck = true;
+        }
+    });
+    //确认密码的验证
+    $("#querenmima").blur(function(){
+        var querenmima = $(this).val();
+        var mima = $("#mima").val();
+        //正则
+        if(querenmima != mima){
+            $(this).siblings("em").attr("class","w").html("x");
+            $(this).siblings(".explain").html("填写不一致！请重试");
+            querencheck = false;
+            return;
+        }else{
+            $(this).siblings("em").attr("class","r").html("√");
+            $(this).siblings(".explain").html("密码一致");
+            querencheck = true;
+            return;
+        }
+    });
+    //点击注册按钮
+    $("#zhuce").click(function(){
+        var str = $("form").serialize();
+        if(querencheck && mimacheck && yonghumingcheck){
+            $.post("/doreg",str,function(data){
+                if(data.result == 1){
+                    alert("恭喜，注册成功！");
+                    //跳转到首页
+                    window.location = "/index";
+                }else if(data.result == -1){
+                    alert("抱歉，用户名被占用了！");
+                }else if(data.result == -2){
+                    alert("抱歉，服务器坏了，等等吧！！");
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

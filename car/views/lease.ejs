@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>汽车租赁 ——  租赁登记</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <style>
+        body{
+            background: url("img/bsj.jpg") no-repeat;
+            background-size:cover ;
+            height: 730px;
+        }
+        .form-control{
+            display:inline-block;
+            width: 50%;
+            margin-left: 10px;
+        }
+        .pl0{
+            padding:0;
+        }
+        #ul{
+            width: 100%;
+        }
+        #ul li{
+            float: none!important;
+        }
+        .modal-content{
+            margin-left: 20px;
+            padding: 20px;
+        }
+        .panel{
+            margin: 20px 0;
+        }
+        .table tr,#tbody tr {
+            height: 40px;
+            line-height: 40px;
+            padding: 10px 0;
+        }
+        .row{
+            padding: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航条开始 -->
+    <% include ./nav/nav.ejs %>
+    <!-- 导航条结束 -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2  modal-content">
+                <ul id="ul" class="nav navbar-nav">
+                </ul>
+            </div>
+            <div class="col-lg-9  col-lg-offset-1 modal-content">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>&nbsp;&nbsp;</th>
+                                    <th>行号</th>
+                                    <th>汽车名称</th>
+                                    <th>每天租金</th>
+                                    <th>可租状态</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tbody">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div style="width: 100%; padding:0 20px">
+                    <div class="row">
+                        <div class="col-lg-3 pl0">
+                            <div class="form-group">
+                                <label for="shi">租凭时长:<input type="text" class="form-control" name="shi" id="shi" placeholder="">天</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 pl0">
+                            <div class="form-group">
+                                <label for="zujin">每天租金:<input type="text" id="zujin" class="form-control" name="zujin"  placeholder="">元</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 pl0">
+                            <div class="form-group">
+                                <label for="zong">合计金额:<input type="text" class="form-control" name="zong" id="zong" placeholder="">元</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 pl0">
+                            <button type="button" id="submit" class="btn btn-success">提交</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 pl0">
+                            <div class="form-group">
+                                客人选择:
+                                <select id="xuan"  class=" form-control" >
+                                    　
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 pl0">
+                            <div class="form-group">
+                                <label for="fu">客人支付:<input type="text" class="form-control" name="fu" id="fu" placeholder=""></label>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 pl0">
+                            <button type="button" class="btn btn-danger">退出</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 pl0">
+                            <span>如果不存在此用户点击“+”</span>
+                            <button type="button" class="btn btn-danger">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/jquery-1.12.3.min.js"></script>
+    <script type="text/javascript">
+        var qicheName;
+        var qicheClass;
+        var ids;
+        var moneny;
+        $.get("/getLease",function (data) {
+            //汽车类上树
+            $.each(data.carClass,function(index,value){
+                var $li=$("<li data='"+value.name+"'></li>")
+                $("<a href='javascript:;'></a>").html(value.name).appendTo($li);
+                $li.appendTo($("#ul"));
+            });
+            //获取汽车类别
+            $("#ul li").click(function () {
+                $("input[type=text]").val("");
+                var carClass=$(this).attr("data");
+                qicheClass=carClass
+                $("#tbody").empty();
+                $.get("/carData?class="+carClass,function (data) {
+                    var paixu =data.results.sort(compare("sid"))
+                    console.log(paixu);
+                    $.each(paixu ,function(i, n){
+                        // day是押金
+                        $tr = $("<tr data-moneny='"+n.day+"'></tr>");
+                        $("<td class='td'><input type='radio' name='xuhao' class='input' value='"+n.sid+"' data-sid='"+n.sid+"'></td>").appendTo($tr);
+                        $("<td></td>").html(n.sid).appendTo($tr);
+                        $("<td></td>").html(n.name).appendTo($tr);
+                        $("<td id='price'></td>").html(n.price).appendTo($tr);
+                        $("<td class='state'></td>").html(n.b==1?"已租出":"未租出").appendTo($tr);
+                        //上树
+                        $tr.appendTo($("#tbody"));
+                        $('.td .input').hover(function () {
+                            if($(this).parent().siblings(".state").html()=="已租出"){
+                                $(this).attr('disabled',true)
+                                return;
+                            }
+                        })
+                    });
+                    //获取汽车一天租金
+                    $("#tbody tr").click(function () {
+                        $("input[name=zujin]").attr("disabled", false);
+                        $("input[name=xuhao]").removeAttr('checked');
+                        $(this).children("td").children("input[name=xuhao]").prop('checked','true');;
+                        var sid=$(this).children("td").children("input[name=xuhao]").val();
+                        //押金
+                        moneny=parseInt($(this).attr("data-moneny"));
+                        ids=sid;
+                        $.get("/carsid?sid="+sid+"&type="+carClass,function (data) {
+                            $("input[name=zujin]").val(data.results.price).attr("disabled", true);
+                            qicheName=data.results.name;
+                            //重新计算
+                            var zong= parseInt($("#zujin").val())*parseInt($("#shi").val())+moneny//计算价格
+                            $("#zong").val(zong);//总价格
+                        })
+                    })
+                })
+            })
+        })
+
+        $("input[name=shi]").on('input',function () {
+            $("#zong").attr("disabled", false);
+            var zong= parseInt($("#zujin").val())*parseInt($(this).val())+moneny//计算价格
+            $("#zong").val(zong).attr("disabled", true);//总价格
+        })
+        $("#zujin").on('input',function () {
+            var zong= parseInt($("#shi").val())*parseInt($(this).val())//计算价格
+            $("#zong").val(zong);//总价格
+        })
+        // 生成一个用不重复的ID
+        function GenNonDuplicateID(){
+            let idStr = Date.now().toString(36)
+            idStr += Math.random().toString(36).substr(3)
+            return idStr
+        }
+        //提交
+        $("#submit").click(function () {
+            var fu=parseInt($("#fu").val());
+            if(isNaN(fu)){
+                alert("请先付钱")
+                return;
+            }
+            if(fu<parseInt($("#zong").val())){
+                alert("所交的钱不够");
+                return;
+            }
+            if($("input[name=xuhao]:checked").parent().siblings(".state").html()=="已租出"){
+                alert("该车已租出，看看其他车吧");
+                return;
+            }
+            //到期时间
+            var dataValue = new Date(new Date().getTime() +(1000 * 60 * 60 * 24)*parseInt($("#shi").val())).getTime()
+            //转换时间格式
+            var time = getMyDate(dataValue);
+            //生成id
+            var n=GenNonDuplicateID()
+            $.post("/lease2",{
+                id:n,
+                // id值
+                sid:ids,
+                //租的时间
+                day:$("#shi").val(),
+                // 租金
+                rent:parseInt($("#zujin").val()),
+                //总金额
+                total:parseInt($("#zong").val()),
+                //客人
+                guest:$("#xuan").val(),
+                //客人付的金额
+                pay:parseInt($("#fu").val()),
+                //找零
+                give:parseInt($("#fu").val())-parseInt($("#zong").val()),
+                //到期时间
+                end:time,
+                //表示已经租出
+                d:true,
+                //汽车名称
+                carName:qicheName,
+                //汽车类型
+                carClass:qicheClass,
+                //押金
+                moneny:moneny
+            },function (data) {
+                if(data.result==1){
+                    alert("成功")
+                }
+            })
+        })
+        //选择客户
+        $.get("/kehu",function (data) {
+            $.each(data.results,function(index,value){
+                $("<option></option>").html(value.name).appendTo($("#xuan"))
+            });
+        })
+        // 排序
+        var compare = function (prop) {
+            return function (obj1, obj2) {
+                var val1 = obj1[prop];
+                var val2 = obj2[prop];
+                if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
+                    val1 = Number(val1);
+                    val2 = Number(val2);
+                }
+                if (val1 < val2) {
+                    return -1;
+                } else if (val1 > val2) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+        //时间戳转换
+        function getMyDate(str) {
+            var oDate = new Date(str),
+                oYear = oDate.getFullYear(),
+                oMonth = oDate.getMonth() + 1,
+                oDay = oDate.getDate(),
+                oHour = oDate.getHours(),
+                oMin = oDate.getMinutes(),
+                oSen = oDate.getSeconds(),
+                oTime = oYear + '-' + getzf(oMonth) + '-' + getzf(oDay) + ' ' + getzf(oHour) + ':' +
+                    getzf(oMin) + ':' + getzf(oSen);//最后拼接时间
+            return oTime;
+        }
+        //补0操作
+        function getzf(num) {
+            if (parseInt(num) < 10) {
+                num = '0' + num;
+            }
+            return num;
+        }
+
+    </script>
+</body>
+</html>

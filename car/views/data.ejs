@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>汽车租赁 ——  数据展示</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <style>
+        body{
+            background: url("img/bjdwl.webp") no-repeat;
+            background-size: cover;
+            height: 730px;
+        }
+    </style>
+</head>
+    
+<body>
+<!-- 导航条开始 -->
+<% include ./nav/nav.ejs %>
+<!-- 导航条结束 -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9  col-lg-offset-1 modal-content">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th id="hao">行号</th>
+                                <th>汽车类型</th>
+                                <th>汽车名称</th>
+                                <th>出租状态</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content-wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="timu1canvas" style="width: 600px;height:400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/js/jquery-1.12.3.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap.js"></script>
+<script type="text/javascript" src="/js/PageNav.js"></script>
+<script type="text/javascript" src="/js/echarts.min.js"></script>
+<script type="text/javascript">
+    $.get("/show",function(data){
+        console.log(data.results);
+        var paixu =data.results.sort(compare("sid"))
+        $.each(paixu ,function(i, n){
+            $tr = $("<tr></tr>");
+            $("<td></td>").html(n.sid).appendTo($tr);
+            $("<td></td>").html(n.type).appendTo($tr);
+            $("<td></td>").html(n.name).appendTo($tr);
+            $("<td></td>").html(n.b==true ? "已出租" : "未出租").appendTo($tr);
+            //上树
+            $tr.appendTo($("#tbody"));
+        });
+    });
+    var compare = function (prop) {
+        return function (obj1, obj2) {
+            var val1 = obj1[prop];
+            var val2 = obj2[prop];
+            if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
+                val1 = Number(val1);
+                val2 = Number(val2);
+            }
+            if (val1 < val2) {
+                return -1;
+            } else if (val1 > val2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    }
+    $.get("/show" , function(data){
+        var a = 0;
+        for (var i = 0; i < data.results.length; i++) {
+            console.log(data.results[i].b==true?1:0)
+            a+=data.results[i].b==true?1:0;
+
+        }
+        console.log(a)
+        var cc = data.results.length - a;
+        console.log(cc)
+        var timu1canvas = echarts.init(document.getElementById('timu1canvas'));
+        timu1canvas.setOption({
+            title : {
+                text: '出租情况',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                x : 'center',
+                y : 'bottom',
+                data:['已出租'+ a +'辆','未出租'+ cc +'辆']
+            },
+            calculable : true,
+            series : [
+                {
+                    name:'出租情况',
+                    type:'pie',
+                    radius : '65%',
+                    center : ['50%', '50%'],
+                    // radius : [30, 110],
+                    selectedMode: 'single',
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                    data:[
+                        {value:a, name:'已出租'+ a +'辆'},
+                        {value:cc, name:'未出租'+ cc +'辆'},
+                    ]
+                }
+            ]
+        });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>汽车租赁 —— 汽车档案</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <style>
+        body{
+            background: url("img/bc.jpg")  no-repeat;
+            background-size: cover;
+            height: 730px;
+        }
+        #pagenavbox a{
+            float: left;
+            padding: 4px 10px;
+            border: 1px solid #eee;
+            text-decoration: none;
+        }
+        #pagenavbox a.cur{
+            background-color: orange;
+        }
+        .mb50{
+            margin-bottom: 50px;
+        }
+        div.modal{
+
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航条开始 -->
+    <% include ./nav/nav.ejs %>
+    <!-- 导航条结束 -->
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="container mb50">
+                        <button type="button" class="btn btn-primary"  data-toggle="modal" data-target="#myModal">增加</button>
+                        <button id="bianji" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModa2">修改</button>
+                        <button  type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModa4">删除</button>
+                        <button id="fanhui" type="button" class="btn btn-primary">返回</button>
+                        <form class="navbar-form navbar-left" role="search">
+                            <div class="form-group">
+                                <input id="mohu" type="text" class="form-control" placeholder="请输入关键词，筛选车辆">
+                            </div>
+                        </form>
+                    </div>
+                    <!--   Basic Table  -->
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>&nbsp;&nbsp;</th>
+                                        <th>行号</th>
+                                        <th>车辆名称</th>
+                                        <th>所属类型</th>
+                                        <th>租赁价格</th>
+                                        <th>计量单位</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="tbody"></tbody>
+                                </table>
+                            </div>
+                            <div id="pagenavbox"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--创建模态框(Modal)-->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">增加车辆</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <p style="width: 100px;padding:0 10px">
+                                行号：
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <p>
+                                <input type="text" id="sid" class="form-control" name="sid">
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <p style="width: 100px;padding:0 10px">
+                                汽车名称：
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <p>
+                                <input type="text" id="name" class="form-control" name="name">
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <p style="width: 100px;padding:0 10px">
+                                所属类型：
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <p>
+                                <select id="xuan"  class=" form-control" >
+                                    　
+                                </select>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <p style="width: 100px;padding:0 10px">
+                                租赁价格：
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <p>
+                                <input type="text" id="price" class="form-control" name="price">
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <p style="width: 100px;padding:0 10px">
+                                租赁押金：
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <p>
+                                <input type="text"  id="day" class="form-control"  name="day">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Carousel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn">ok</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <!--编辑模态框-->
+    <div class="modal fade "  id="myModa2" tabindex="-1"  role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">修改</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <p style="width: 100px;padding:0 10px">
+                                行号：
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <p>
+                                <input type="text" id="sid2" class="form-control" name="sid2">
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <p style="width: 100px;padding:0 10px">
+                                汽车名称：
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <p>
+                                <input type="text" id="name2" class="form-control" name="name2">
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <p style="width: 100px;padding:0 10px">
+                                所属类型：
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <p>
+                                <input type="text" id="type2" class="form-control" name="type2" disabled>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <p style="width: 100px;padding:0 10px">
+                                租赁价格：
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <p>
+                                <input type="text" id="price2" class="form-control" name="price2">
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <p style="width: 100px;padding:0 10px">
+                                租赁押金：
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <p>
+                                <input type="text"  id="day2" class="form-control"  name="day2">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Carousel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn2">ok</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <!--删除模态框-->
+    <div class="modal fade "  id="myModa4" tabindex="-1"  role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    确定删除吗？
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Carousel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn3">ok</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <script type="text/javascript" src="/js/jquery-1.12.3.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.js"></script>
+    <script type="text/javascript" src="/js/PageNav.js"></script>
+    <script type="text/javascript">
+        //请求一次，创建分页条
+        $.get("/carfiles1?page=1",function(data){
+            //分页条
+            new PageNav({
+                boxid : "pagenavbox",
+                page : 1,
+                pageAmount : data.pageAmount,
+                change : function(pagenumber){
+                    gotopage(pagenumber);
+                }
+            });
+            gotopage(1);
+        });
+        // 排序
+        var compare = function (prop) {
+            return function (obj1, obj2) {
+                var val1 = obj1[prop];
+                var val2 = obj2[prop];
+                if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
+                    val1 = Number(val1);
+                    val2 = Number(val2);
+                }
+                if (val1 < val2) {
+                    return -1;
+                } else if (val1 > val2) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+        //Ajax请求，请求JSON数据
+        function gotopage(pagenumber){
+            //清空
+            $("#tbody").empty();
+            //获得新的数据
+            $.get("/carfiles1?page=" + pagenumber,function(data){
+                // console.log(data.results);
+                var paixu =data.results.sort(compare("sid"))
+                $.each(paixu ,function(i, n){
+                    $tr = $("<tr></tr>");
+                    $("<td><input type='radio' name='xuhao' value='"+n.sid+"' data-sid='"+n.sid+"'></td>").appendTo($tr);
+                    $("<td></td>").html(n.sid).appendTo($tr);
+                    $("<td></td>").html(n.name).appendTo($tr);
+                    $("<td></td>").html(n.type).appendTo($tr);
+                    $("<td></td>").html(n.price).appendTo($tr);
+                    $("<td></td>").html("天").appendTo($tr);
+                    //上树
+                    $tr.appendTo($("#tbody"));
+                });
+            });
+        }
+
+        //模糊查询
+        $("#mohu").on("input",function(){
+            var sou = $("#mohu").val();
+            $.get("/search?sou="+sou ,function(data){
+                console.log(data)
+                $("#tbody").empty();
+                var paixu =data.results.sort(compare("sid"))
+                $.each(paixu,function(i, n){
+                    $tr = $("<tr></tr>");
+                    $("<td><input type='radio' name='xuhao' value='"+n.sid+"' data-sid='"+n.sid+"'></td>").appendTo($tr);
+                    $("<td></td>").html(n.sid).appendTo($tr);
+                    $("<td></td>").html(n.name).appendTo($tr);
+                    $("<td></td>").html(n.type).appendTo($tr);
+                    $("<td></td>").html(n.price).appendTo($tr);
+                    $("<td></td>").html("天").appendTo($tr);
+                    //上树
+                    $tr.appendTo($("#tbody"));
+                    $("#pagenavbox").empty();
+                });
+            });
+        });
+        //添加员工
+        $("#btn").click(function(){
+            $.post("/carfiles",{
+                sid:parseInt($("input[name=sid]").val()),
+                name : $("input[name=name]").val(),
+                type : $("#xuan").val(),
+                price:$("input[name=price]").val(),
+                day:$("input[name=day]").val(),
+                b:false
+            },function(data){
+                if(data.result == 1){
+                    alert("提交成功！");
+                    gotopage(1);
+                    $("input[type=text]").val("");
+                }else if(data.result == -1){
+                    alert("提交失败，学号被占用！");
+                }else if(data.result == -2){
+                    alert("服务器错误！请联系管理员，怎么联系我也不知道！");
+                }
+            })
+        });
+        // 编辑员工
+        $("#bianji").click(function () {
+            $('#myModa2').modal('hide')
+            var  sid = $("input[name=xuhao]:checked").val();
+            if(sid==undefined){
+                alert("请选中员工，再进行编辑");
+                return;
+            }
+            $.get("/carfiles2/" + sid,function (data) {
+                // console.log(data);
+                $("input[name=sid2]").val(data.info.sid);
+                $("input[name=name2]").val(data.info.name);
+                $("input[name=type2]").val(data.info.type)
+                $("input[name=price2]").val(data.info.price);
+                $("input[name=day2]").val(data.info.day);
+            })
+        })
+        //修改员工
+        $("#btn2").click(function(){
+            var  sid = $("input[name=xuhao]:checked").val();
+            console.log(sid);
+            $.post("/carfiles2/" + sid,{
+                sid:parseInt($("input[name=sid2]").val()),
+                name : $("input[name=name2]").val(),
+                type : $("input[name=type2]").val(),
+                price:$("input[name=price2]").val(),
+                day:$("input[name=day2]").val(),
+            },function(data){
+                console.log(data);
+                if(data.result == 1){
+                    gotopage(1);
+                    alert("修改成功！");
+                }else{
+                    alert("服务器错误！请联系管理员，怎么联系我也不知道！");
+                }
+            })
+        });
+        //删除员工
+        $("#btn3").click(function () {
+            var sid = $("input[name=xuhao]:checked").val();
+            var tr=$("input[name=xuhao]:checked").parents("tr");
+            $.ajax({
+                url : "/carfiles/" + sid,
+                type : "delete",
+                success : function(data){
+                    if(data.result == 1){
+                        alert("删除成功");
+                        tr.remove();
+                        gotopage(1);
+                    }else{
+                        alert("服务器错误！");
+                    }
+                }
+            });
+        });
+        //返回首页
+        $("#fanhui").click(function () {
+            window.location="/index"
+        })
+        //获取汽车类型
+        $.get("/getLease",function (data) {
+            $.each(data.carClass,function(index,value){
+                $("<option></option>").html(value.name).appendTo($("#xuan"))
+            });
+        })
+
+    </script>
+
+
+</body>
+</html>

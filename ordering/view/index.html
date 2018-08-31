@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>无人点单无人支付系统</title>
+		<meta name="viewport"
+			  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<link rel="stylesheet" type="text/css" href="css/basic.css"/>
+		<link rel="stylesheet" type="text/css" href="css/index.css"/>
+		<style>
+			a{
+				text-decoration: none;
+				color: black;
+			}
+		</style>
+	</head>
+	<body>
+		<header class="index_header">
+			<div class="hlist">
+				<img src="images/rexiao.png"/>
+				<p>热销榜</p>
+			</div>
+			<div class="hlist">
+				<img src="images/caidan.png" />
+				<p>点过的菜</p>
+			</div>
+			<div class="hlist">
+				<img src="images/sousuo.png"/>
+				<p>搜你喜欢</p>
+			</div>
+		</header>
+		<div class="content">
+
+		</div>
+		<script src='js/jquery-1.12.3.min.js'></script>
+		<script src="js/underscore-min.js"></script>
+		<script>
+			//全部菜品
+            	$.ajax({
+            	    url : "http://172.16.49.70:3000/student22222",
+            	    type:"GET",
+            	    dataType:"json",
+                    success:function(data){
+                        console.log(data)
+                        var results = data.results
+						console.log(results)
+                        var json={};
+                        for(var i=0;i<results.length;i++){
+                            var key=results[i].xuan;
+                            if(json[key]){
+                                json[key]++;
+                            }else{
+                                json[key]=1;
+                            }
+                        }
+                        console.log(json);
+                        var arr=[];
+                        for(var key in json){
+                            console.log(key);
+                            arr.push(key);
+                        }
+                        console.log(arr);
+                        for(var j=0;j<arr.length;j++){
+                            var item="<div class='item'><h3 class='item_cate'>"+arr[j]+"</h3><ul class='item_list' id='item"+(j+1)+"'></ul></div>";
+                            $('.content').append(item);
+                        }
+                        for(var i=0;i<results.length;i++){
+                            for(var j=0;j<arr.length;j++){
+                                if(results[i].xuan==arr[j]){
+                                    var str=
+                                        "<li><a href='./detail.html?"+results[i].sid+"'>" +
+                                        "<div class='inner'>" +
+                                        "<img class='item_img' style='width: 100%;' ' src='http://172.16.49.70:3000/uploads/"+results[i].address+".jpg'>"+
+                                        "<p class='title'>"+results[i].name +"</p>"+
+                                        "<p class='money'>"+results[i].phone+"元</p>"
+                                    "</div></li></ul>"
+
+                                    $("#item"+(j+1)).append(str);
+                                }
+                            }
+                        }
+                    }
+            	})
+
+		</script>
+	</body>
+</html>

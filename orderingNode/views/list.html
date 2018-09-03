@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="/css/bootstrap.css" rel="stylesheet" />
+    <style>
+        #pagenavbox a{
+            float: left;
+            padding: 4px 10px;
+            border: 1px solid #eee;
+            text-decoration: none;
+        }
+        #pagenavbox a.cur{
+            background-color: orange;
+        }
+        button{
+            margin-right: 10px;
+        }
+        .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus{
+            border:0px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <ul id="main-nav" class="nav nav-tabs nav-stacked" style="">
+                <li class="active">
+                    <a href="#">
+                        首页
+                    </a>
+                </li>
+                <li>
+                    <a href="#systemSetting" class="nav-header collapsed" data-toggle="collapse">
+                        商品管理
+                    </a>
+                    <ul id="systemSetting" class="nav nav-list collapse secondmenu" style="height: 0px;">
+                        <li><a href="/">商品分类</a></li>
+                        <li><a href="/list">商品列表</a></li>
+                        <li><a href="/add">增加商品</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-10">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <p>
+                            <select id="xuan"  class=" form-control" >
+                                <option value='' disabled selected style='display:none;'>请选择类型</option>
+                            </select>
+                        </p>
+                    </div>
+                    <div class="col-md-2">
+                        <p>
+                            <input type="text" id="search" class="form-control" name="search">
+                        </p>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-success">提交</button>
+                    </div>
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>标题</th>
+                        <th>分类</th>
+                        <th>价格</th>
+                        <th>推荐</th>
+                        <th>热销</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+            <div id="pagenavbox"></div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+<!--编辑客户模态框-->
+<div class="modal fade "  id="myModa2" tabindex="-1"  role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">编辑菜品</h4>
+            </div>
+            <div class="modal-body">
+                <iframe  frameborder="0" width="100%" height="800" scrolling = "no" id="if"  src="/admin/student/bianji"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Carousel</button>
+                <button type="submit" class="btn btn-primary" data-dismiss="modal" id="btn2">ok</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<script src="/js/jquery-1.12.3.min.js"></script>
+<script src="/js/bootstrap.js"></script>
+<script type="text/javascript" src="/js/PageNav.js"></script>
+<script type="text/javascript">
+    //请求一次，创建分页条
+    $.get("/student?page=1",function(data){
+        //分页条
+        new PageNav({
+            boxid : "pagenavbox",
+            page : 1,
+            pageAmount : data.pageAmount,
+            change : function(pagenumber){
+                gotopage(pagenumber);
+
+            }
+        });
+        gotopage(1);
+    });
+    // 排序
+    var compare = function (prop) {
+        return function (obj1, obj2) {
+            var val1 = obj1[prop];
+            var val2 = obj2[prop];
+            if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
+                val1 = Number(val1);
+                val2 = Number(val2);
+            }
+            if (val1 < val2) {
+                return -1;
+            } else if (val1 > val2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    }
+    //Ajax请求，请求JSON数据
+    function gotopage(pagenumber){
+        //清空
+        $("#tbody").empty();
+        //获得新的数据
+        $.get("/student?page=" + pagenumber,function(data){
+            var paixu =data.results.sort(compare("sid"))
+            $.each(paixu ,function(i, n){
+                $tr = $("<tr></tr>");
+                // $("<td><input type='radio' name='xuhao' value='"+n.sid+"' data-sid='"+n.sid+"'></td>").appendTo($tr);
+                $("<td><p>"+n.name+"</p><img style='width: 100px; height: auto' src='./uploads/"+n.address+".jpg' alt=''></td>").appendTo($tr);
+                $("<td></td>").html(n.xuan).appendTo($tr);
+                $("<td></td>").html(n.phone).appendTo($tr);
+                $("<td></td>").html(n.tuijian=="A"?"v":"x").appendTo($tr);
+                $("<td></td>").html(n.tuijian2=="B"?"v":"x").appendTo($tr);
+                $("<td></td>").html(n.state==1?"v":"x").appendTo($tr);
+                $("<td><button  data-sid='"+n.sid+"' data-toggle='modal' data-target='#myModa2' type='button' class='bianji btn btn-primary'>修改</button><button  type='button' data-sid='"+n.sid+"' class='shanchu btn btn-primary' >删除</button></td>").appendTo($tr);
+                //上树
+                $tr.appendTo($("#tbody"));
+            });
+        });
+    }
+    //菜的分类
+    $.get("/getLease",function (data) {
+        //汽车类上树
+        $.each(data.carClass, function (index, value) {
+            $("<option></option>").html(value.cailei).appendTo($("#xuan"))
+        });
+    })
+    //删除某个菜
+    $("#tbody").delegate(".shanchu","click",function () {
+        var  sid = $(this).attr("data-sid");
+        var tr=$(this).parent().parent();
+        if(confirm("确定删除吗？")){
+            $.ajax({
+                url : "/student/" + sid,
+                type : "delete",
+                success : function(data){
+                    if(data.result == 1){
+                        alert("删除成功");
+                        tr.remove();
+                    }else{
+                        alert("服务器错误！");
+                    }
+                }
+            });
+        }
+    });
+    $("#tbody").delegate(".bianji","click",function () {
+        var iframe=$("#if").contents()
+
+        var  sid = $(this).attr("data-sid");
+        console.log(sid);
+       $.get("/student/"+sid,function (data) {
+          var info=data.info;
+           iframe.find("#xuan2").val(info.xuan)//菜类
+           iframe.find("#sid").val(info.sid)//菜排序
+           iframe.find("#name").val(info.name)//菜名
+           iframe.find("#phone").val(info.phone)//价格
+           iframe.find("#preview").attr("src","/uploads/"+info.address+".jpg");//图片
+           iframe.find("#date").val(info.id)//描述
+           iframe.find("#he1").attr("checked", info.he=="已审核"?true:false);//已审核
+           iframe.find("#he2").attr("checked", info.he=="已审核"?false:true)//未审核
+           iframe.find("#tuijian1").attr("checked", info.tuijian=="A"?true:false)//精品
+           iframe.find("#tuijian2").attr("checked", info.tuijian2=="B"?true:false)//热销
+       })
+    });
+    //切换菜类
+    $("#xuan").on("change",function () {
+        //清掉分页
+        $("#pagenavbox").empty();
+        var $this=$(this).val();
+        $.get("/cai?xuan="+$(this).val()+"&page=1",function (data) {
+            console.log(data);
+            //清空
+            $("#tbody").empty();
+            //分页条
+            new PageNav({
+                boxid : "pagenavbox",
+                page : 1,
+                pageAmount : data.pageAmount,
+                change : function(pagenumber){
+                    gotosearch($this,pagenumber);
+                }
+            });
+            gotosearch($this,1)
+        })
+    })
+    function gotosearch(content,pagenumber){
+            $.get("/cai?xuan="+content+"&page="+pagenumber,function (data) {
+                //清空
+                $("#tbody").empty();
+                var paixu =data.data.sort(compare("sid"))
+                $.each(paixu ,function(i, n){
+                    $tr = $("<tr></tr>");
+                    // $("<td><input type='radio' name='xuhao' value='"+n.sid+"' data-sid='"+n.sid+"'></td>").appendTo($tr);
+                    $("<td><p>"+n.name+"</p><img style='width: 100px; height: auto' src='./uploads/"+n.address+".jpg' alt=''></td>").appendTo($tr);
+                    $("<td></td>").html(n.xuan).appendTo($tr);
+                    $("<td></td>").html(n.phone).appendTo($tr);
+                    $("<td></td>").html(n.tuijian=="A"?"v":"x").appendTo($tr);
+                    $("<td></td>").html(n.tuijian2=="B"?"v":"x").appendTo($tr);
+                    $("<td></td>").html(n.state==1?"v":"x").appendTo($tr);
+                    $("<td><button  data-sid='"+n.sid+"' data-toggle='modal' data-target='#myModa2' type='button' class='bianji btn btn-primary'>修改</button><button  type='button' data-sid='"+n.sid+"' class='shanchu btn btn-primary' >删除</button></td>").appendTo($tr);
+                    //上树
+                    $tr.appendTo($("#tbody"));
+                });
+            })
+    }
+    function gotosearch2(content,pagenumber){
+        $.get("/search?w="+content+"&page="+pagenumber,function (data) {
+            //清空
+            $("#tbody").empty();
+            console.log(data.results)
+            var paixu =data.results.sort(compare("sid"))
+            $.each(paixu ,function(i, n){
+                $tr = $("<tr></tr>");
+                // $("<td><input type='radio' name='xuhao' value='"+n.sid+"' data-sid='"+n.sid+"'></td>").appendTo($tr);
+                $("<td><p>"+n.name+"</p><img style='width: 100px; height: auto' src='./uploads/"+n.address+".jpg' alt=''></td>").appendTo($tr);
+                $("<td></td>").html(n.xuan).appendTo($tr);
+                $("<td></td>").html(n.phone).appendTo($tr);
+                $("<td></td>").html(n.tuijian=="A"?"v":"x").appendTo($tr);
+                $("<td></td>").html(n.tuijian2=="B"?"v":"x").appendTo($tr);
+                $("<td></td>").html(n.state==1?"v":"x").appendTo($tr);
+                $("<td><button  data-sid='"+n.sid+"' data-toggle='modal' data-target='#myModa2' type='button' class='bianji btn btn-primary'>修改</button><button  type='button' data-sid='"+n.sid+"' class='shanchu btn btn-primary' >删除</button></td>").appendTo($tr);
+                //上树
+                $tr.appendTo($("#tbody"));
+            });
+        })
+    }
+    //模糊查找
+    $("#search").on("input",function () {
+        //清掉分页
+        $("#pagenavbox").empty();
+        var $this=$(this).val();
+        $.get("/search?w="+$this+"&page=1",function (data) {
+            console.log(data);
+            //清空
+            $("#tbody").empty();
+            //分页条
+            new PageNav({
+                boxid : "pagenavbox",
+                page : 1,
+                pageAmount : data.pageAmount,
+                change : function(pagenumber){
+                    gotosearch2($this,pagenumber);
+                }
+            });
+            gotosearch2($this,1)
+        })
+        // if($("#xuan").val()==null){
+        //     var content=$(this).val();
+        //     //清掉分页
+        //     $("#pagenavbox").empty();
+        //     $.get("/search?w="+content,function (data) {
+        //         //清空
+        //         $("#tbody").empty();
+        //         var paixu =data.results.sort(compare("sid"))
+        //         $.each(paixu ,function(i, n){
+        //             $tr = $("<tr></tr>");
+        //             $("<td><p>"+n.name+"</p><img style='width: 100px; height: auto' src='./uploads/"+n.address+".jpg' alt=''></td>").appendTo($tr);
+        //             $("<td></td>").html(n.xuan).appendTo($tr);
+        //             $("<td></td>").html(n.phone).appendTo($tr);
+        //             $("<td></td>").html(n.tuijian=="A"?"v":"x").appendTo($tr);
+        //             $("<td></td>").html(n.tuijian2=="B"?"v":"x").appendTo($tr);
+        //             $("<td></td>").html(n.state==1?"v":"x").appendTo($tr);
+        //             $("<td><button  data-sid='"+n.sid+"' type='button' class='bianji btn btn-primary'>修改</button><button  type='button' data-sid='"+n.sid+"' class='shanchu btn btn-primary' >删除</button></td>").appendTo($tr);
+        //             //上树
+        //             $tr.appendTo($("#tbody"));
+        //         });
+        //     })
+        // }else{
+        //     //精确查找
+        //     var types=$("#xuan").val()
+        //     var content=$(this).val();
+        //     //清掉分页
+        //     $("#pagenavbox").empty();
+        //     $.get("/search2?w="+content+"&type="+types,function (data) {
+        //         //清空
+        //         $("#tbody").empty();
+        //
+        //         var paixu =data.results.sort(compare("sid"))
+        //         $.each(paixu ,function(i, n){
+        //             $tr = $("<tr></tr>");
+        //             // $("<td><input type='radio' name='xuhao' value='"+n.sid+"' data-sid='"+n.sid+"'></td>").appendTo($tr);
+        //             $("<td><p>"+n.name+"</p><img style='width: 100px; height: auto' src='./uploads/"+n.address+".jpg' alt=''></td>").appendTo($tr);
+        //             $("<td></td>").html(n.xuan).appendTo($tr);
+        //             $("<td></td>").html(n.phone).appendTo($tr);
+        //             $("<td></td>").html(n.tuijian=="A"?"v":"x").appendTo($tr);
+        //             $("<td></td>").html(n.tuijian2=="B"?"v":"x").appendTo($tr);
+        //             $("<td></td>").html(n.state==1?"v":"x").appendTo($tr);
+        //             $("<td><button  data-sid='"+n.sid+"' type='button' class='bianji btn btn-primary'>修改</button><button  type='button' data-sid='"+n.sid+"' class='shanchu btn btn-primary' >删除</button></td>").appendTo($tr);
+        //             //上树
+        //             $tr.appendTo($("#tbody"));
+        //         });
+        //     })
+        // }
+    })
+    $("#btn2").click(function () {
+        window.location="/list"
+    })
+    var arr = [1,3,5,7,9,11];
+
+</script>
+
+</body>
+</html>

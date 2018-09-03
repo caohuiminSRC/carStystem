@@ -1,0 +1,137 @@
+<link href="/css/bootstrap.css" rel="stylesheet" />
+<form action="/studentsss" method="post" enctype="multipart/form-data" >
+    <div class="row">
+        <div class="col-md-2">
+            <p>
+                所属分类：
+            </p>
+        </div>
+        <div class="col-md-5">
+            <p>
+                <select id="xuan2"  name="xuan" class=" form-control" >
+                    　
+                </select>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <p>
+                商品排序：
+            </p>
+        </div>
+        <div class="col-md-5">
+            <p>
+                <input   type="text" id="sid" class="form-control" name="sid">
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <p>
+                商品名称：
+            </p>
+        </div>
+        <div class="col-md-5">
+            <p>
+                <input type="text" id="name" class="form-control" name="name">
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <p>
+                商品价格：
+            </p>
+        </div>
+        <div class="col-md-5">
+            <p>
+                <input type="text" id="phone" class="form-control" name="phone">
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <p>
+                封面图：
+            </p>
+        </div>
+        <div class="col-md-5">
+            <p>
+                <input type="file" id="file_upload"  name="address">
+            <div class="image_container">
+                <img id="preview" style="height:130px;width:117px;border-width:0px;"/>
+            </div>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <p>
+                商品描述：
+            </p>
+        </div>
+        <div class="col-md-5">
+            <p>
+                <textarea name="id"  id="date" cols="50" rows="5"></textarea>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <p>
+                状态：
+            </p>
+        </div>
+        <div class="col-md-5">
+            <p>
+                <input type="radio" id="he1"   name="he" value="已审核" >已审核
+                <input type="radio" id="he2"   name="he" value="未审核" >未审核
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <p>
+                加入推荐：
+            </p>
+        </div>
+        <div class="col-md-5">
+            <p>
+                <input type="checkbox" id="tuijian1"    name="tuijian" value="A" >精品
+                <input type="checkbox" id="tuijian2"   name="tuijian2" value="B" >热销
+            </p>
+        </div>
+    </div>
+    <input type="submit">
+</form>
+<script src="/js/jquery-1.12.3.min.js"></script>
+<script src="/js/bootstrap.js"></script>
+<script>
+    $.get("/getLease",function (data) {
+        //汽车类上树
+        $.each(data.carClass, function (index, value) {
+            $("<option></option>").html(value.cailei).appendTo($("#xuan2"))
+        });
+    })
+    //实现图片预览
+    $("#file_upload").change(function () {
+        var $file = $(this);
+        var fileObj = $file[0];
+        var windowURL = window.URL || window.webkitURL;
+        var dataURL;
+        var $img = $("#preview");
+        if (fileObj && fileObj.files && fileObj.files[0]) {
+            dataURL = windowURL.createObjectURL(fileObj.files[0]);
+            $img.attr('src', dataURL);
+        } else {
+            dataURL = $file.val();
+            var imgObj = document.getElementById("preview");
+            // 两个坑:
+            // 1、在设置filter属性时，元素必须已经存在在DOM树中，动态创建的Node，也需要在设置属性前加入到DOM中，先设置属性在加入，无效；
+            // 2、src属性需要像下面的方式添加，上面的两种方式添加，无效；
+            imgObj.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+            imgObj.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = dataURL;
+        }
+    });
+</script>

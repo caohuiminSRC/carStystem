@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>房间预订</title>
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <style type="text/css">
+        body{
+            background: url(/public/images/4.jpg);
+            background-size: cover;
+        }
+        .table tr th{
+            padding:5px ;
+            width: 120px;
+            text-align: center;
+        }
+        .table tr td{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation" style="background: rgba(100,50,60,.5);border: none;">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">酒店管理系统</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li  class="active"><a href="/">首页</a></li>
+                <li><a href="/onLine">在线预定</a></li>
+                <li ><a href="/findOnline">订单查询</a></li>
+                <li><a href="/revise">修改密码</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a>欢迎！<%= xingming %> 用户<%= xuehao %></a></li>
+                <li><a href="#" id="quit">退出登录</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table" >
+                <tr>
+                    <th>标识类别</th>
+                    <th>房间类型</th>
+                    <th>面积（平方米）</th>
+                    <th>床位数</th>
+                    <th>早餐</th>
+                    <th>网络</th>
+                    <th class="col-lg-5">电视</th>
+                    <th>价格（元/每天）</th>
+                </tr>
+                <tbody id="corses_table">
+
+                </tbody>
+            </table>
+            <script type="text/template" id="template">
+                <tr>
+                    <td>{%= cid %}</td>
+                    <td>{%=name%}</td>
+                    <td>{%= measure %}</td>
+                    <td>{%= bed %}</td>
+                    <td>{%= meal %}</td>
+                    <td>{%= network %}</td>
+                    <td>{%= television %}</td>
+                    <td>{%= television %}</td>
+                    <td>
+                        <input type="button" class="btn btn-warning"  data-id="{%=name%}" value="免费预订"/>
+                    </td>
+                </tr>
+            </script>
+        </div>
+    </div>
+</div>
+    <script type="text/javascript" src="/public/js/underscore-min.js"></script>
+    <script type="text/javascript" src="/public/js/jquery-1.12.3.min.js"></script>
+    <script type="text/javascript">
+        var template = $("#template").html();
+        var complied = _.template(template);
+        getinfoandcreatetable();
+        function getinfoandcreatetable(url){
+            if(url == undefined){
+                url = "/admin/course/all";
+            }
+            //清空表格
+            $("#corses_table").empty();
+            $.get(url,function(data){
+                    data.results.forEach(function(dictionary){
+                        //上树
+                        var $dom = $(complied(dictionary));
+                        $dom.appendTo("#corses_table");
+                        //绑定监听，这里是绿色按钮。红按钮的监听在上面。
+                        $dom.find("input[type=button]").click(function(){
+
+                        });
+                    });
+                });
+        }
+        //模糊查询
+        $("#mohu").on("input",function(){
+            getinfoandcreatetable("/admin/course/search?w=" + $(this).val());
+        });
+        //退出登录
+        $("#quit").click(function(){
+            if(confirm("你确定要退出吗？")){
+                $.get("/quit",function(data){
+                    if(data.result == 1){
+                        alert("退出成功")
+                        window.location = '/'
+                    }else{
+                        alert("退出失败")
+                    }
+                })
+            }
+        })
+    </script>
+
+</body>
+</html>

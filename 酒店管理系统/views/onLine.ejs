@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>选课面板</title>
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <style type="text/css">
+        .table tr th{
+            padding:5px ;
+            width: 120px;
+            text-align: center;
+        }
+        .table tr td{
+            text-align: center;
+        }
+        body{
+            background: url(/public/images/11.jpg) no-repeat;
+            background-size: cover;
+        }
+        .row{
+            background: rgba(100,100,100,.5);
+            margin-top: 50px;
+        }
+       #formId div{
+            float: left;
+            width: 50%;
+            height: 50px;
+        }
+        b{
+            display: inline-block;
+            width: 100px;
+            color: #eee;
+        }
+        h1{
+            color: #afd9ee;
+        }
+        button{
+            width: 80px;
+            height: 40px;
+            background: #afd9ee;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation" style="background: rgba(100,100,100,.5);border: none">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">酒店管理系统</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/">首页</a></li>
+                <li  class="active"><a href="/onLine">在线预定</a></li>
+                <li><a href="/findOnline">订单查询</a></li>
+                <li><a href="/revise">修改密码</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a>欢迎！<%= xingming %> 用户<%= xuehao %></a></li>
+                <li><a href="#" id="quit">退出登录</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>酒店欢迎你！</h1>
+            <form id="formId">
+                <div>
+                    <b>入住日期：</b><input  name="start" type="date" id="start"/>
+                </div>
+                <div>
+                    <b>离店日期：</b><input  name="end" type="date" id="end"/>
+                </div>
+                <div>
+                    <b>房间类型:</b>
+                    <select name="meal" id="meal" >
+
+                    </select>
+                </div>
+                <div>
+                    <b>房间剩余量：</b><input type="text" name="sheng" id="sheng" class=" ls">
+                </div>
+                <div>
+                    <b>价格：</b><input type="text" name="price" id="price" class="ls">
+                </div>
+                <div>
+                    <b>预订数量：</b><input type="text" name="geshu" id="geshu" class="ls">
+                </div>
+                <div>
+                    <b>入住人姓名：</b><input type="text" name="checkin" id="checkin"  placeholder="多个人入住请用逗号隔开">
+                </div>
+                <div>
+                    <b>联系人：</b><input type="text" name="pwText" id="pwText" >
+                </div>
+                <div>
+                    <b>联系电话：</b><input type="text" name="phone" id="phone" >
+                </div>
+                <div>
+                    <b>留言：</b><input type="text" name="message" id="message" >
+                </div>
+            </form>
+            <button onclick="myFunction()">确定</button>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="/public/js/underscore-min.js"></script>
+<script type="text/javascript" src="/public/js/jquery-1.12.3.min.js"></script>
+<script type="text/javascript">
+    //获取房间类型数据
+    $.get("/admin/course/all",{z:Math.random()}, function (data) {
+        for (var i=0;i<data.results.length;i++){
+            //采用es6字符串模板填充
+            $(`<option>${data.results[i].name}</option>`).appendTo("#meal")
+        }
+        $("#meal option").eq(0).attr("selected", true);
+        $("#sheng").val(data.results[0].surplus);
+        //进入页面是获取房间数据
+        $.get("/admin/room/noShow?type="+$("#meal option[selected]").text(),function (data) {
+            if(data.results.length==0){
+                $("#surplus").val(0);
+                return;
+            }
+            for (var i=0;i<data.results.length;i++){
+                //采用es6字符串模板填充
+                $(`<option>${data.results[i].cid}</option>`).appendTo("#Roomnumber")
+            }
+
+            $("#price").val(data.results[0].price);
+        })
+    })
+    //获取房间数据
+    $("#meal").change(function(){
+        $.get("/admin/course/moyige?type="+$(this).val(),{z:Math.random()}, function (data){
+            console.log(data.data.surplus);
+            $("#sheng").val(data.data.surplus);
+        })
+        // 清空房间号
+        $("#Roomnumber").empty();
+        $("#surplus").val("");
+        $("#price").val("");
+        $.get("/admin/room/noShow?type="+$(this).val(),function (data) {
+            console.log(data.results);
+            if(data.results.length==0){
+                $("#surplus").val(0);
+                return;
+            }
+            for (var i=0;i<data.results.length;i++){
+                //采用es6字符串模板填充
+                $(`<option>${data.results[i].cid}</option>`).appendTo("#Roomnumber")
+            }
+            $("#price").val(data.results[0].price);
+        })
+    })
+    //入住
+    function myFunction() {
+        var postData = $("#formId").serialize();
+        var tmpDic = {};
+        for (var i in postData.split("&")) {
+            var row = postData.split("&")[i];
+            tmpDic[row.split("=")[0]] = decodeURIComponent(row.split("=")[1]);
+        }
+        console.log(tmpDic);
+        if($("#sheng").val()==0){
+            alert("没有房间了")
+            return;
+
+        }else{
+            $.post("/onlineRoom",tmpDic,function (data) {
+                if(data.result==1){
+                    alert("预订成功")
+                }else{
+                    alert("预订失败")
+                }
+            })
+        }
+    }
+    //时间戳转换
+    function getMyDate(str) {
+        var oDate = new Date(str),
+            oYear = oDate.getFullYear(),
+            oMonth = oDate.getMonth() + 1,
+            oDay = oDate.getDate(),
+            oHour = oDate.getHours(),
+            oMin = oDate.getMinutes(),
+            oSen = oDate.getSeconds(),
+            oTime = oYear + '-' + getzf(oMonth) + '-' + getzf(oDay) + ' ' + getzf(oHour) + ':' +
+                getzf(oMin) + ':' + getzf(oSen);//最后拼接时间
+        return oTime;
+    }
+    //补0操作
+    function getzf(num) {
+        if (parseInt(num) < 10) {
+            num = '0' + num;
+        }
+        return num;
+    }
+
+    //模糊查询
+    $("#mohu").on("input",function(){
+        getinfoandcreatetable("/admin/course/search?w=" + $(this).val());
+    });
+    //退出登录
+    $("#quit").click(function(){
+        if(confirm("你确定要退出吗？")){
+            $.get("/quit",function(data){
+                if(data.result == 1){
+                    alert("退出成功")
+                    window.location = '/'
+                }else{
+                    alert("退出失败")
+                }
+            })
+        }
+    })
+</script>
+
+</body>
+</html>

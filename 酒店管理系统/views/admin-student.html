@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>添加房间</title>
+    <link href="/public/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/css/dashboard.css" rel="stylesheet">
+    <!--jQuery dependencies-->
+    <link rel="stylesheet" href="/public/css/jquery-ui.css"/>
+
+    <link rel="stylesheet" href="/public/css/pqgrid.min.css"/>
+
+    <link rel="stylesheet" href="/public/themes/office/pqgrid.css"/>
+
+    <link href="/public/css/jquery-accordion-menu.css" rel="stylesheet" type="text/css" />
+    <link href="/public/css/font-awesome.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .tab-pane {
+            padding-top: 20px;
+        }
+
+        label {
+            cursor: pointer;
+        }
+        body{
+            background-image: url(/public/images/7.jpg);
+        }
+        *{box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;}
+        .filterinput{
+            background-color:rgba(249, 244, 244, 0);
+            border-radius:15px;
+            width:90%;
+            height:30px;
+            border:thin solid #FFF;
+            text-indent:0.5em;
+            font-weight:bold;
+            color:#FFF;
+        }
+        #demo-list a{
+            overflow:hidden;
+            text-overflow:ellipsis;
+            -o-text-overflow:ellipsis;
+            white-space:nowrap;
+            width:100%;
+            background: rgba(100,100,50,.5);
+        }
+        .content{
+            overflow: hidden;
+            width: 300px;
+            margin:10px;
+        }
+        .main{
+            margin-left: 100px;
+            padding: 0;
+            width: 70%;
+        }
+    </style>
+</head>
+
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background: rgba(100,100,50,.5)">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">欢迎使用酒店管理系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <!--<li><a>欢迎！<%= username %> 管理者</a></li>-->
+                <li><a href="#" id="quit">退出登录</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2">
+            <div class="content">
+                <div id="jquery-accordion-menu" class="jquery-accordion-menu">
+                    <ul id="demo-list">
+                        <li><a href="#">管理系统 </a>
+                            <ul class="submenu">
+                                <li><a href="#">入住管理</a>
+                                    <ul class="submenu">
+                                        <li><a href="/lobby">大堂入住 </a></li>
+                                        <li><a href="/check">订单入住 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">退房管理 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/out">退房管理 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">记录查询 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/record">入住记录查询 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">房间管理 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/admin/room/find">查询房间信息</a></li>
+                                        <li><a href="/admin/student/">新建房间</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">房类管理 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/category">房间类别管理 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">修改密码 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/admin/revise">修改密码</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <input type="button" class="btn btn-info btn-lg" value="添加房间" data-toggle="modal" data-target="#myModal"/>
+            <input type="button" class="btn btn-success btn-lg" value="刷新" onclick="refresh()"/>
+            <!--表格start-->
+            <section class="grid" style="width:1000px;">
+                <div id="grid" style="margin:20px 0;height: 300px"></div>
+                <!--表格end-->
+                <input type="button" value="删除所选" id="shanchubtn" class="btn btn-danger" style="float:right;" />
+            </section>
+        </div>
+    </div>
+</div>
+<!--添加房间类别-->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">添加房间</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    房间号:
+                    <input class="form-control" type="text" id="xuhaoTxt"/>
+                </p>
+                <p>
+                    房间类型:
+                    <select  id="nameTxt" class="form-control">
+
+                    </select>
+                </p>
+                <p>
+                    房间位置:
+                    <input class="form-control" type="text" id="measure"/>
+                </p>
+                <p>
+                    房间描述:
+                    <input class="form-control" type="text" id="bed"/>
+                </p>
+                <p>
+                    房间状态:
+                    <select name="meal" id="meal" class="form-control">
+                        <option value="未入住">未入住</option>
+                    </select>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="tijiaoBtn">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/public/js/jquery-1.12.3.min.js"></script>
+<script src="/public/js/jquery-ui.min.js"></script>
+<script src="/public/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/public/js/underscore-min.js"></script>
+<script src="/public/js/pqgrid.min.js"></script>
+<script src="/public/js/jquery-accordion-menu.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+    $(function(){
+        //顶部导航切换
+        $("#demo-list li").click(function(){
+            $("#demo-list li.active").removeClass("active")
+            $(this).addClass("active");
+        })
+    })
+</script>
+<script type="text/javascript">
+
+    jQuery("#jquery-accordion-menu").jqueryAccordionMenu();
+
+</script>
+<script type="text/javascript">
+    //获取房间类型数据
+    $.get("/admin/course/all",{z:Math.random()}, function (data) {
+        for (var i=0;i<data.results.length;i++){
+            //采用es6字符串模板填充
+            $(`<option>${data.results[i].name}</option>`).appendTo("#nameTxt")
+        }
+    })
+    $('.btns').click(function(){
+        $(this).siblings().children('input').attr('checked','true');
+        console.log(123)
+    })
+    //添加房间
+    $("#tijiaoBtn").click(function () {
+        //这个JSON会直接进入数据库，所以体会到了NoSQL的好处，程序是JSON，持久也是JSON，不变形！
+        $.post("/admin/room/add", {
+            //房间号
+            "cid": Number($("#xuhaoTxt").val()),
+            //房间类型
+            "name": $("#nameTxt").val(),
+            // 房间位置
+            "measure": $("#measure").val(),
+            // 房间描述
+            "bed": $("#bed").val(),
+            // 房间状态
+            "meal": $("#meal").val()
+        }, function (data) {
+            alert(data);
+            $("#myModal").modal("hide");
+            // refresh();
+            window.location="/admin/student";
+        });
+    });
+    //删除按钮
+    $("#shanchubtn").click(function(){
+        //除以2，这是因为paramquery这个框架有点小问题，会重复算tr两次
+        var amount = $("tr.pq-row-select").length / 2;
+
+        var boolean = confirm("确认要删除" + amount + "条目么？");
+
+        if(!boolean){
+            return;
+        }
+
+        //要删除的元素的_id的数组
+        var needToDelete = [];
+        //遍历，找到要删除的元素的_id，放入数组，集体发给模型，进行集体删除！
+        $("tr.pq-row-select").each(function(){
+            needToDelete.push($(this).find("td[pq-col-indx=0]").html());
+        });
+        //去重，这是因为paramquery这个框架有点小问题，会重复算tr两次
+        needToDelete = _.uniq(needToDelete);
+        //发出Ajax请求
+        $.post("/admin/room/delete",{
+            needToDelete : JSON.stringify(needToDelete)
+        },function(data){
+            if(data == -1){
+                alert("删除错误！服务器故障，请联系18883248234");
+            }else{
+                alert("成功删除" + data + "条");
+                $("tr.pq-row-select").slideUp();
+            }
+        });
+    });
+    //退出登录
+    $("#quit").click(function(){
+        if(confirm("你确定要退出吗？")){
+            $.get("/quit",function(data){
+                if(data.result == 1){
+                    alert("退出成功")
+                    window.location = '/'
+                }else{
+                    alert("退出失败")
+                }
+            })
+        }
+    })
+</script>
+<script type="text/javascript">
+    refresh();
+    function refresh() {
+        //数据
+        $.get("/admin/room/all",{z:Math.random()}, function (data) {
+            //用ajax拿到结果
+            var dataobj = data.results;
+            //配置表格
+            $("#grid").pqGrid({
+                width: 1000,
+                height: 400,
+                title: "全部房间一览表",
+                resizable: false,
+                draggable: false,
+                dataModel: {
+                    data: dataobj  //填充数据
+                },
+                selectionModel: { type: 'none', subtype:'incr', cbHeader:true, cbAll:true},
+                pageModel: { type: "local", rPP: 5, strRpp: "{0}", strDisplay: "{0} to {1} of {2}" ,rPPOptions:[3,5,8]},
+                colModel: [
+                    {title: "_id", width: 90, dataType: "string", dataIndx: "_id",editable:false},
+                    {title: "房间号", width: 40, dataType: "integer", dataIndx: "cid"},
+                    {title: "房间类型", width: 100, dataType: "string", dataIndx: "name"},
+                    {title: "房间位置", width: 60, dataType: "string", dataIndx: "measure"},
+                    {title: "房间描述", width: 100, dataType: "integer", dataIndx: "bed"},
+                    {title: "房间状态", width: 100, dataType: "string", dataIndx: "meal"},
+                    { title: "", dataIndx: "state", width: 30, minWidth:30, align: "center", type:'checkBoxSelection', cls: 'ui-state-default', resizable: false, sortable:false }
+                ],
+                //用户编辑单元格结束之后做的事情
+                cellSave: function (event, ui) {
+                    console.log(ui);
+                    // ui.rowData能够拿到这一行的全部数据，甭废话，直接扔给服务器持久化！
+                    $.post("/admin/room/change", ui.rowData, function (data) {
+
+                    });
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

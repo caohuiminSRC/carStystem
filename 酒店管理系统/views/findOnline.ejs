@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>订单查询</title>
+    <link href="/public/css/bootstrap.min.css" rel="stylesheet">
+
+    <!--jQuery dependencies-->
+    <link rel="stylesheet" href="/public/css/jquery-ui.css"/>
+    <script src="/public/js/jquery-1.12.3.min.js"></script>
+    <script src="/public/js/jquery-ui.min.js"></script>
+    <script src="/public/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/public/js/underscore-min.js"></script>
+    <style type="text/css">
+        .tab-pane {
+            padding-top: 20px;
+        }
+        body{
+            background: url(/public/images/12.jpg) no-repeat;
+            background-size: cover;
+        }
+
+        label {
+            cursor: pointer;
+        }
+        #formId p{
+            float: left;
+            width: 50%;
+            height: 50px;
+        }
+        .col-lg-9{
+            height: 50px;
+        }
+        b{
+            display: inline-block;
+            width: 100px;
+            color: #333;
+        }
+        h1{
+            color: #afd9ee;
+        }
+        #changeImg{
+            margin-left: 105px;
+        }
+    </style>
+</head>
+
+<body>
+<nav class="navbar navbar-default" role="navigation" style="background: rgba(50,50,60,.5);border: none">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">酒店管理系统</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/">首页</a></li>
+                <li><a href="/onLine">在线预定</a></li>
+                <li  class="active"><a href="/findOnline">订单查询</a></li>
+                <li><a href="/revise">修改密码</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a>欢迎！<%= xingming %> 用户<%= xuehao %></a></li>
+                <li><a href="#" id="quit">退出登录</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h1>订单查询</h1>
+            <div class="modal-body">
+                <div class="col-lg-9">
+                    <b>订单查询:</b>
+                    <input type="text" id="xuhaoTxt" placeholder="请输入订房时所留联系人或联系电话"/>
+                </div>
+                <div class="col-lg-9">
+                    <b>验证码：</b>
+                    <input type="text" id="Verification" />
+                </div>
+                <div class="col-lg-9">
+                    <a href="#" id="changeImg">
+                        <canvas class="show-captcha" id="canvas" width="150" height="40"></canvas>
+                    </a>
+                </div>
+                <div class="col-lg-5">
+                    <button type="button" class="btn btn-success" id="findBtn">查找</button>
+                </div>
+                <div class="col-lg-10">
+                    <form id="formId">
+                        <p>
+                            <b>入住日期：</b><input name="start" type="date" id="start"/>
+                        </p>
+                        <p>
+                            <b>离店日期：</b><input name="end" type="date" id="end"/>
+                        </p>
+                        <p>
+                            <b>房间类型:</b>
+                            <select name="meal" id="meal" >
+
+                            </select>
+                        </p>
+                        <p>
+                            <b>价格：</b><input type="text" name="price" id="price" class="ls">
+                        </p>
+                        <p>
+                            <b>预订数量：</b><input type="text" name="geshu" id="geshu" class="ls">
+                        </p>
+                        <p>
+                            <b>入住人姓名：</b><input type="text" name="checkin" id="checkin"  placeholder="多个人入住请用逗号隔开">
+                        </p>
+                        <p>
+                            <b>联系人：</b><input type="text" name="pwText" id="pwText" >
+                        </p>
+                        <p>
+                            <b>联系电话：</b><input type="text" name="phone" id="phone" >
+                        </p>
+                        <p>
+                            <b>留言：</b><input type="text" name="message" id="message" >
+                        </p>
+                    </form>
+
+                </div>
+                <div class="col-lg-12">
+                    <button type="button" id="xiugai" class="btn btn-default" >修改订单</button>
+                    <button type="button" id="delete" class="btn btn-primary" >取消订单</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    //随机验证码
+        /**生成一个随机数**/
+        function randomNum(min, max) {
+            return Math.floor(Math.random() * (max - min) + min);
+        }
+        /**生成一个随机色**/
+        function randomColor(min, max) {
+            var r = randomNum(min, max);
+            var g = randomNum(min, max);
+            var b= randomNum(min, max);
+            return "rgb(" + r + "," + g + "," + b + ")";
+        }
+        document.getElementById("changeImg").onclick = function(e) {
+            e.preventDefault();
+            code=drawPic();
+        }
+        /**绘制验证码图片**/
+        function drawPic() {
+            var canvas = document.getElementById("canvas");
+            var width = canvas.width;
+            var height = canvas.height;
+            //获取该canvas的2D绘图环境
+            var ctx = canvas.getContext('2d');
+            ctx.textBaseline ='bottom';
+            /**绘制背景色**/
+            ctx.fillStyle = randomColor(180,240);
+            //颜色若太深可能导致看不清
+            ctx.fillRect(0,0,width,height);
+            /**绘制文字**/
+            var str ='ABCEFGHJKLMNPQRSTWXY123456789';
+
+            var code="";
+            //生成四个验证码
+            for(var i=1;i<=4;i++) {
+                var txt = str[randomNum(0,str.length)];
+                code=code+txt;
+                ctx.fillStyle = randomColor(50,160);
+                //随机生成字体颜色
+                ctx.font = randomNum(15,40) +'px SimHei';
+                //随机生成字体大小
+                var x =10 +i *25;
+                var y = randomNum(25,35);
+                var deg = randomNum(-45,45);
+                //修改坐标原点和旋转角度
+                ctx.translate(x, y);
+                ctx.rotate(deg * Math.PI /180);
+                ctx.fillText(txt,0,0);
+                //恢复坐标原点和旋转角度
+                ctx.rotate(-deg * Math.PI /180);
+                ctx.translate(-x, -y);
+            }
+
+            /**绘制干扰线**/
+            for(var i=0;i<3;i++) {
+                ctx.strokeStyle = randomColor(40, 180);
+                ctx.beginPath();
+                ctx.moveTo(randomNum(0,width/2), randomNum(0,height/2));
+                ctx.lineTo(randomNum(0,width/2), randomNum(0,height));
+                ctx.stroke();
+            }
+            /**绘制干扰点**/
+            for(var i=0;i <50;i++) {
+                ctx.fillStyle = randomColor(255);
+                ctx.beginPath();
+                ctx.arc(randomNum(0, width), randomNum(0, height),1,0,2* Math.PI);
+                ctx.fill();
+            }
+            return code;
+        }
+    var code=drawPic();
+    //查找房间
+    $("#findBtn").click(function () {
+
+        console.log(code);;
+        if($("#Verification").val()==code&&$("#xuhaoTxt").val()!=""){
+            $.get("/student/room/findOnline?cid="+$("#xuhaoTxt").val(),function (data) {
+                if(data.result.length==0){
+                    alert("没有该订单")
+                    return;
+                }else{
+                    var directory=data.result;
+                    var time=directory[0].start.slice(0,10);
+                    var time2=directory[0].end.slice(0,10);
+                    $("#start").val(time);
+                    $("#end").val(time2);
+                    $("#meal").append(`<option>${directory[0].meal}</option>`);
+                    $("#price").val(directory[0].price);
+                    $("#geshu").val(directory[0].geshu);
+                    $("#checkin").val(directory[0].checkin);
+                    $("#pwText").val(directory[0].pwText);
+                    $("#phone").val(directory[0].phone);
+                    $("#message").val(directory[0].message);
+                    // //按钮绑定_id
+                    $("#xiugai").attr("data-id",directory[0]._id)
+                    $("#delete").attr("data-id",directory[0]._id)
+                }
+            })
+        }else{
+            alert("验证码输入错误，或者名字输入错误")
+        }
+    })
+    //退订按钮
+    $("#delete").click(function () {
+        var boolean = confirm("确认要退订吗？");
+
+        if(!boolean){
+            return;
+        }
+
+        var _id=$(this).attr("data-id");
+        console.log(_id);
+        $.get("/student/room/chekout?_id="+_id,function (data) {
+            if(data.result==1){
+                alert("退订成功")
+            }else{
+                alert("退订失败")
+            }
+        })
+    })
+    //修改按钮
+    $("#xiugai").click(function () {
+        var postData = $("#formId").serialize();
+        var tmpDic = {};
+        for (var i in postData.split("&")) {
+            var row = postData.split("&")[i];
+            tmpDic[row.split("=")[0]] = decodeURIComponent(row.split("=")[1]);
+        }
+        tmpDic._id=$(this).attr("data-id");
+        // delete tmpDic["start"];
+        // delete tmpDic["end"];
+        console.log(tmpDic)
+        $.post("/student/room/change", tmpDic, function (data) {
+            if(data.result==1){
+                alert("修改成功")
+            }else{
+                alert("修改失败")
+            }
+        });
+    })
+    //退出登录
+    $("#quit").click(function(){
+        if(confirm("你确定要退出吗？")){
+            $.get("/quit",function(data){
+                if(data.result == 1){
+                    alert("退出成功")
+                    window.location = '/'
+                }else{
+                    alert("退出失败")
+                }
+            })
+        }
+    })
+
+</script>
+</body>
+</html>

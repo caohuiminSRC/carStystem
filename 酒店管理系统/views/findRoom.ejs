@@ -1,0 +1,270 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>查询房间信息</title>
+    <link href="/public/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/css/dashboard.css" rel="stylesheet">
+    <!--jQuery dependencies-->
+    <link rel="stylesheet" href="/public/css/jquery-ui.css"/>
+    <link href="/public/css/jquery-accordion-menu.css" rel="stylesheet" />
+    <link href="/public/css/font-awesome.css" rel="stylesheet" />
+    <style type="text/css">
+        .tab-pane {
+            padding-top: 20px;
+        }
+
+        label {
+            cursor: pointer;
+        }
+        body{
+            background-image: url(/public/images/6.jpg);
+        }
+        .main h4{
+            color: #000;
+            font-weight: bold;
+            font-size: 22px;
+        }
+        b{
+            display: inline-block;
+            width: 110px;
+            text-align: right;
+            margin-right: 5px;
+        }
+        *{box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;}
+        .filterinput{
+            background-color:rgba(249, 244, 244, 0);
+            border-radius:15px;
+            width:90%;
+            height:30px;
+            border:thin solid #FFF;
+            text-indent:0.5em;
+            font-weight:bold;
+            color:#FFF;
+        }
+        #demo-list a{
+            overflow:hidden;
+            text-overflow:ellipsis;
+            -o-text-overflow:ellipsis;
+            white-space:nowrap;
+            width:100%;
+            background: rgba(100,100,150,.5);
+        }
+        .content{
+            overflow: hidden;
+            width: 300px;
+            margin:10px;
+        }
+        .main{
+            background: #afd9ee;
+            width: 50%;
+            background: rgba(100,100,150,.5);
+            margin-top: 20px;
+            margin-left: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background: rgba(100,100,150,.5)">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">欢迎使用酒店管理系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a>欢迎！<%= username %> 管理者</a></li>
+                <li><a href="#" id="quit">退出登录</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2">
+            <div class="content">
+                <div id="jquery-accordion-menu" class="jquery-accordion-menu">
+                    <ul id="demo-list">
+                        <li><a href="#">管理系统 </a>
+                            <ul class="submenu">
+                                <li><a href="#">入住管理</a>
+                                    <ul class="submenu">
+                                        <li><a href="/lobby">大堂入住 </a></li>
+                                        <li><a href="/check">订单入住 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">退房管理 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/out">退房管理 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">记录查询 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/record">入住记录查询 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">房间管理 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/admin/room/find">查询房间信息</a></li>
+                                        <li><a href="/admin/student/">新建房间</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">房类管理 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/category">房间类别管理 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">修改密码 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/admin/revise">修改密码</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h1>房间查询</h1>
+            <div class="modal-body">
+                <p>
+                    <b>请输入房间号:</b>
+                    <input type="text" id="xuhaoTxt"/>
+                    <button type="button" class="btn btn-success" id="findBtn">查找</button>
+                </p>
+                <p>
+                    <b>房间号:</b>
+                    <input  disabled type="text" id="nameTxt"/>
+                </p>
+                <p>
+                    <b>房间类型:</b>
+                    <select name="meal" id="meal" >
+                        
+                    </select>
+                </p>
+                <p>
+                    <b>房间位置:</b>
+                    <input type="text" id="bed"/>
+                </p>
+                <p>
+                    <b>房间描述:</b>
+                    <input  type="text" id="renshuTxt"/>
+                </p>
+                <p>
+                    <b>房间状态:</b>
+                    <select name="state" id="state">
+                        
+                    </select>
+                </p>
+                <button type="button" id="xiugai" class="btn btn-default" >修改</button>
+                <button type="button" id="delete" class="btn btn-primary" >删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/public/js/jquery-1.12.3.min.js"></script>
+<script src="/public/js/jquery-ui.min.js"></script>
+<script src="/public/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/public/js/underscore-min.js"></script>
+<script src="/public/js/jquery-accordion-menu.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function(){
+        //顶部导航切换
+        $("#demo-list li").click(function(){
+            $("#demo-list li.active").removeClass("active")
+            $(this).addClass("active");
+        })
+    })
+</script>
+<script type="text/javascript">
+    jQuery("#jquery-accordion-menu").jqueryAccordionMenu();
+</script>
+<script type="text/javascript">
+    //查找房间
+    $("#findBtn").click(function () {
+        $.get("/admin/room/findRoom?cid="+$("#xuhaoTxt").val(),function (data) {
+                if(data.result==undefined){
+                    alert("没有该房间")
+                    return;
+                }else{
+                    var directory=data.result;
+                    $("#nameTxt").val(directory.cid)
+                    $("#meal").append(`<option>${directory.name}</option>`)
+                    $("#bed").val(directory.measure)
+                    $("#renshuTxt").val(directory.bed)
+                    $("#state").append(`<option>${directory.meal}</option>`);
+                    //按钮绑定_id
+                    $("#xiugai").attr("data-id",directory._id)
+                    $("#delete").attr("data-id",directory._id)
+                }
+        })
+    })
+    //删除按钮
+    $("#delete").click(function(){
+        var boolean = confirm("确认要删除么？");
+        if(!boolean){
+            return;
+        }
+        //要删除的元素的_id的数组
+        var needToDelete = [];
+        //遍历，找到要删除的元素的_id，放入数组，集体发给模型，进行集体删除！
+            needToDelete.push($(this).attr("data-id"));
+        //去重，这是因为paramquery这个框架有点小问题，会重复算tr两次
+        needToDelete = _.uniq(needToDelete);
+        //发出Ajax请求
+        $.post("/admin/room/delete",{
+            needToDelete : JSON.stringify(needToDelete)
+        },function(data){
+            if(data == -1){
+                alert("删除错误！服务器故障，请联系18883248234");
+            }else{
+                alert("成功删除");
+                $("input[type=text]").val("");
+                $("#meal").val("");
+                $("#state").val("");
+            }
+        });
+    });
+    //修改按钮
+    $("#xiugai").click(function () {
+        var Xindata={
+            "_id":$(this).attr("data-id"),
+            "bed":$("#bed").val(),
+            "measure":$("#renshuTxt").val(),
+        }
+        $.post("/admin/room/change2", Xindata, function (data) {
+            if(data.result==1){
+                alert("修改成功")
+            }else{
+                alert("修改失败")
+            }
+        });
+    })
+    //退出登录
+    $("#quit").click(function(){
+        if(confirm("你确定要退出吗？")){
+            $.get("/quit",function(data){
+                if(data.result == 1){
+                    alert("退出成功")
+                    window.location = '/'
+                }else{
+                    alert("退出失败")
+                }
+            })
+        }
+    })
+</script>
+</body>
+</html>

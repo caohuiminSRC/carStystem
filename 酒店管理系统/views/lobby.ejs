@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>大堂入住</title>
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <link href="/public/css/dashboard.css" rel="stylesheet">
+    <link href="/public/css/jquery-accordion-menu.css" rel="stylesheet" type="text/css" />
+    <link href="/public/css/font-awesome.css" rel="stylesheet" type="text/css" />
+    <style>
+        *{box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;}
+        #demo-list a{
+            overflow:hidden;
+            text-overflow:ellipsis;
+            -o-text-overflow:ellipsis;
+            white-space:nowrap;
+            width:100%;
+        }
+        .main{
+            margin-top: 30px;
+            overflow: hidden;
+            background: #eea236;
+        }
+        #main{
+            height:auto;
+            overflow: hidden;
+            background: rgba(80,40,30,.5);
+            width: 70%;
+            margin-left: 100px;
+        }
+        body{
+            background-image: url(/public/images/2.jpg);
+        }
+        b{
+            display: inline-block;
+            width: 100px;
+            color: #e7c3c3;
+        }
+        .left{
+            float: left;
+            width: 50%;
+        }
+        button{
+            background: #e7c3c3;
+            border: none;
+            width: 80px;
+            height: 40px;
+        }
+        *{box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;}
+        .filterinput{
+            background-color:rgba(249, 244, 244, 0);
+            border-radius:15px;
+            width:90%;
+            height:30px;
+            border:thin solid #FFF;
+            text-indent:0.5em;
+            font-weight:bold;
+            color:#FFF;
+        }
+        #demo-list a{
+            overflow:hidden;
+            text-overflow:ellipsis;
+            -o-text-overflow:ellipsis;
+            white-space:nowrap;
+            width:100%;
+            background: rgba(80,40,30,.5)
+        }
+        .content{
+            overflow: hidden;
+            width: 300px;
+            margin:10px;
+        }
+        #main #formId{
+            width: 1000px;
+            margin: 0 auto;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background: rgba(80,40,30,.5)">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">欢迎使用酒店管理系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a>欢迎！<%= username %> 管理者</a></li>
+                <li><a href="#" id="quit">退出登录</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid lefts">
+    <div class="row">
+        <div class="col-sm-3 col-md-2">
+            <div class="content">
+                <div id="jquery-accordion-menu" class="jquery-accordion-menu">
+                    <ul id="demo-list">
+                        <li><a href="#">管理系统 </a>
+                            <ul class="submenu">
+                                <li><a href="#">入住管理</a>
+                                    <ul class="submenu">
+                                        <li><a href="/lobby">大堂入住 </a></li>
+                                        <li><a href="/check">订单入住 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">退房管理 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/out">退房管理 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">记录查询 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/record">入住记录查询 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">房间管理 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/admin/room/find">查询房间信息</a></li>
+                                        <li><a href="/admin/student/">新建房间</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">房类管理 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/category">房间类别管理 </a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">修改密码 </a>
+                                    <ul class="submenu">
+                                        <li><a href="/admin/revise">修改密码</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id="main">
+            <h1>大堂入住</h1>
+            <form id="formId">
+                <div class="left">
+                    <h3>顾客信息</h3>
+                    <p>
+                        <b>证件类型：</b>
+                        <select name="ID" id="ID">
+                        <option value="身份证">身份证</option>
+                        </select>
+                    </p>
+                    <p>
+                        <b>证件号：</b><input type="text" name="sid" id="sid">
+                    </p>
+                    <p>
+                        <b>姓名：</b><input type="text" name="pwText" id="pwText">
+                    </p>
+                    <p>
+                    <b>性别：</b>
+                        <select name="sex" id="sex">
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                    </p>
+                </div>
+                <div  class="left">
+                    <h3 class="title">房间信息</h3>
+                    <p>
+                        <b>房间类型:</b>
+                        <select name="meal" id="meal"></select>
+                    </p>
+                    <p>
+                        <b>房间号:</b>
+                        <select name="Roomnumber" id="Roomnumber"></select>
+                    </p>
+                    <p>
+                        <b>房间剩余量：</b><input type="text" name="surplus" id="surplus">
+                    </p>
+                    <p>
+                        <b>价格：</b><input type="text" name="price" id="price">
+                    </p>
+                    <p>
+                        <b>入住人姓名：</b><input type="text" name="checkin" id="checkin" placeholder="多个人入住请用逗号隔开">
+                    </p>
+                </div>
+                <p style="width: 100%"><button onclick="myFunction()">确定</button></p>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/public/js/jquery-1.12.3.min.js"></script>
+<script src="/public/js/bootstrap.min.js"></script>
+<script src="/public/js/jquery-accordion-menu.js"></script>
+<script type="text/javascript">
+    $(function(){
+        //顶部导航切换
+        $("#demo-list li").click(function(){
+            $("#demo-list li.active").removeClass("active")
+            $(this).addClass("active");
+        })
+    })
+</script>
+<script type="text/javascript">
+
+    jQuery("#jquery-accordion-menu").jqueryAccordionMenu();
+
+</script>
+<script>
+    //获取房间类型数据
+    $.get("/admin/course/all",{z:Math.random()}, function (data) {
+        for (var i=0;i<data.results.length;i++){
+            //采用es6字符串模板填充
+            $(`<option>${data.results[i].name}</option>`).appendTo("#meal")
+        }
+        $("#meal option").eq(0).attr("selected", true);
+        $("#surplus").val(data.results[0].surplus);
+        //进入页面是获取房间数据
+        $.get("/admin/room/noShow?type="+$("#meal option[selected]").text(),function (data) {
+            if(data.results.length==0){
+                $("#surplus").val(0);
+                return;
+            }
+            for (var i=0;i<data.results.length;i++){
+                //采用es6字符串模板填充
+                $(`<option>${data.results[i].cid}</option>`).appendTo("#Roomnumber")
+            }
+            $("#price").val(data.results[0].price);
+        })
+    })
+    //获取房间数据
+    $("#meal").change(function(){
+        $.get("/admin/course/moyige?type="+$(this).val(),{z:Math.random()}, function (data){
+            console.log(data);
+            $("#surplus").val(data.data.surplus);
+        })
+        // 清空房间号
+        $("#Roomnumber").empty();
+        $("#surplus").val("");
+        $("#price").val("");
+        $.get("/admin/room/noShow?type="+$(this).val(),function (data) {
+            if(data.results.length==0){
+                $("#surplus").val(0);
+                return;
+            }
+            for (var i=0;i<data.results.length;i++){
+                //采用es6字符串模板填充
+                $(`<option>${data.results[i].cid}</option>`).appendTo("#Roomnumber")
+            }
+            $("#price").val(data.results[0].price);
+        })
+    })
+    //退出登录
+    $("#quit").click(function(){
+        if(confirm("你确定要退出吗？")){
+            $.get("/quit",function(data){
+                if(data.result == 1){
+                    alert("退出成功")
+                    window.location = '/'
+                }else{
+                    alert("退出失败")
+                }
+            })
+        }
+    })
+
+    //入住
+    function myFunction() {
+        var postData = $("#formId").serialize();
+        var tmpDic = {};
+        for (var i in postData.split("&")) {
+            var row = postData.split("&")[i];
+            tmpDic[row.split("=")[0]] = decodeURIComponent(row.split("=")[1]);
+        }
+        console.log(tmpDic);
+        tmpDic.day=1;
+        //到期时间
+        var dataValue = new Date(new Date().getTime() +(1000 * 60 * 60 * 24)*parseInt(tmpDic.day)).getTime()
+        //转换时间格式
+        var time = getMyDate(dataValue);
+        tmpDic.end=time
+       $.post("/checkin",tmpDic,function (data) {
+           if(data.result==1){
+               alert("入住成功")
+           }else{
+               alert("入住失败")
+           }
+       })
+    }
+    //时间戳转换
+    function getMyDate(str) {
+        var oDate = new Date(str),
+            oYear = oDate.getFullYear(),
+            oMonth = oDate.getMonth() + 1,
+            oDay = oDate.getDate(),
+            oHour = oDate.getHours(),
+            oMin = oDate.getMinutes(),
+            oSen = oDate.getSeconds(),
+            oTime = oYear + '-' + getzf(oMonth) + '-' + getzf(oDay) + ' ' + getzf(oHour) + ':' +
+                getzf(oMin) + ':' + getzf(oSen);//最后拼接时间
+        return oTime;
+    }
+    //补0操作
+    function getzf(num) {
+        if (parseInt(num) < 10) {
+            num = '0' + num;
+        }
+        return num;
+    }
+</script>
+</body>
+</html>

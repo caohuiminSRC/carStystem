@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>酒店管理系统 -- 更改密码</title>
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <style type="text/css">
+        body{
+            background: url(/public/images/13.jpg) no-repeat;
+            background-size: cover;
+         }
+        form{
+            background: transparent;
+            padding:20px 20px 20px 0;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation" style="background: rgba(100,50,60,.5);border: none">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">酒店管理系统</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/">首页</a></li>
+                <li><a href="/onLine">在线预定</a></li>
+                <li ><a href="/findOnline">订单查询</a></li>
+                <li  class="active"><a href="/revise">修改密码</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a>欢迎！<%= xingming %> 用户<%= xuehao %></a></li>
+                <li><a href="#" id="quit">退出登录</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div  class="col-lg-4 tab-pane" id="xiugai">
+    <!--修改学生密码-->
+    <p>
+        用户：<input type="text" disabled id="sidText" class="form-control" value="<%=xuehao%>">
+    </p>
+    <p>
+        新密码：<input type="text" id="pwText" class="form-control">
+    </p>
+    <p>
+        <input id="gaimimabtn" type="button" value="提交" class="btn btn-success" />
+    </p>
+</div>
+<script type="text/javascript" src="/public/js/jquery-1.12.3.min.js"></script>
+<script>
+    //退出登录
+    $("#quit").click(function(){
+        if(confirm("你确定要退出吗？")){
+            $.get("/quit",function(data){
+                if(data.result == 1){
+                    alert("退出成功")
+                    window.location = '/'
+                }else{
+                    alert("退出失败")
+                }
+            })
+        }
+    })
+    $("#gaimimabtn").click(function(){
+        $.post("/admin/student/changepw",{
+            "sid" : $("#sidText").val(),
+            "pw" : $("#pwText").val()
+        },function(data){
+            alert(data);
+        });
+    });
+</script>
+</body>
+</html>
